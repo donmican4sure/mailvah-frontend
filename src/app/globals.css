@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar { display: none; } 
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+@keyframes marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+.animate-marquee { display: flex; width: 200%; animation: marquee 30s linear infinite; }
+
+.bg-grid-light { background-image: linear-gradient(to right, #f1f5f9 1px, transparent 1px), linear-gradient(to bottom, #f1f5f9 1px, transparent 1px); }
+.dark .bg-grid-dark { background-image: linear-gradient(to right, #1e293b 1px, transparent 1px), linear-gradient(to bottom, #1e293b 1px, transparent 1px); }
+
+.glass-nav-light { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(226, 232, 240, 0.8); }
+.dark .glass-nav-dark { background: rgba(11, 15, 25, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(30, 41, 59, 0.8); }
+
+.page-transition { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.toast-enter { animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes progress { 0% { width: 0%; } 100% { width: 100%; } }
+.animate-progress { animation: progress 2s linear forwards; }
+
+@keyframes nodeActivate { to { border-color: #3b82f6; background-color: rgba(59, 130, 246, 0.1); box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); } }
+@keyframes coreActivate { to { background-color: #3b82f6; } }
+.animate-spin-slow { animation: spin 3s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.spam-highlight { background-color: rgba(239, 68, 68, 0.15); border-bottom: 2px wavy #ef4444; font-weight: bold; color: #b91c1c; padding: 0 2px; border-radius: 2px; }
+.dark .spam-highlight { background-color: rgba(248, 113, 113, 0.2); color: #fca5a5; }
+
+.bento-card { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.bento-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); }
+.dark .bento-card:hover { box-shadow: 0 20px 40px -15px rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.4); }
+
+input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; margin: 10px 0; }
+input[type=range]:focus { outline: none; }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 12px; cursor: pointer; border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); background: rgba(148, 163, 184, 0.2); }
+.dark input[type=range]::-webkit-slider-runnable-track { background: rgba(30, 41, 59, 0.5); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 28px; width: 28px; border-radius: 50%; background: #ffffff; border: 4px solid #3b82f6; cursor: pointer; margin-top: -8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); transition: transform 0.1s; }
+.dark input[type=range]::-webkit-slider-thumb { background: #0f172a; border-color: #3b82f6; }
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+
+.locked-blur { filter: blur(6px); user-select: none; pointer-events: none; opacity: 0.6; }
+
+@keyframes cursorMove { 0% { transform: translate(50px, 150px); opacity: 0; } 10% { transform: translate(50px, 150px); opacity: 1; } 30% { transform: translate(250px, 20px); opacity: 1; } 35% { transform: translate(250px, 20px) scale(0.8); opacity: 1; } 40% { transform: translate(250px, 20px) scale(1); opacity: 1; } 45% { transform: translate(150px, 150px); opacity: 0; } 100% { transform: translate(150px, 150px); opacity: 0; } }
+@keyframes modalPop { 0%, 35% { opacity: 0; transform: scale(0.95); pointer-events: none; } 40%, 75% { opacity: 1; transform: scale(1); pointer-events: auto; } 80%, 100% { opacity: 0; transform: scale(0.95); pointer-events: none; } }
+@keyframes barFill { 0%, 40% { width: 0%; } 70%, 100% { width: 100%; } }
+@keyframes rowsAppear { 0%, 75% { opacity: 0.3; filter: grayscale(1); } 80%, 100% { opacity: 1; filter: grayscale(0); } }
+.anim-cursor { animation: cursorMove 8s infinite; z-index: 50; }
+.anim-modal { animation: modalPop 8s infinite; z-index: 40; }
+.anim-bar { animation: barFill 8s infinite; }
+.anim-rows { animation: rowsAppear 8s infinite; }
