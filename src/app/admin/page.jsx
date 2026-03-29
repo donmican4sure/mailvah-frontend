@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { 
-  LayoutDashboard, Users, FileText, Sparkles, 
-  Settings, Save, Check, Search, ShieldAlert, Activity, DollarSign
+  LayoutDashboard, Users, FileText, Settings, 
+  Save, Check, Search, ShieldAlert, Activity, DollarSign, Edit3
 } from 'lucide-react';
 
 export default function SuperadminDashboard() {
   const [activeTab, setActiveTab] = useState('cms');
-  const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
   
@@ -22,48 +21,17 @@ export default function SuperadminDashboard() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // 1. Call your secure Next.js API to trigger Gemini
-  const handleAIGenerate = async () => {
-    if (!articleData.title) {
-      showToast("Please enter an Article Title first!");
-      return;
-    }
-    
-    setIsGenerating(true);
-    try {
-      const prompt = `Write a highly professional, SEO-optimized B2B blog post about: "${articleData.title}". Write it in Markdown format. Do not include the title in the markdown, just start with the introduction. Focus on enterprise outbound email security, bounce rates, and avoiding spam filters.`;
-      
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
-      
-      const data = await response.json();
-      
-      if (data.text) {
-        // Auto-generate a URL slug based on the title
-        const generatedSlug = articleData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        
-        setArticleData({
-          ...articleData,
-          slug: generatedSlug,
-          description: `Learn the expert enterprise strategies regarding ${articleData.title.toLowerCase()}.`,
-          content: data.text
-        });
-        showToast("AI Content Generated Successfully!");
-      }
-    } catch (error) {
-      showToast("Error generating content.");
-    } finally {
-      setIsGenerating(false);
-    }
+  // Auto-generate URL slug as you type the title
+  const handleTitleChange = (e) => {
+    const newTitle = e.target.value;
+    const generatedSlug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    setArticleData({ ...articleData, title: newTitle, slug: generatedSlug });
   };
 
-  // 2. Save the article to Supabase
+  // Save the article to Supabase
   const handlePublish = async () => {
     if (!articleData.title || !articleData.slug || !articleData.content) {
-      showToast("Missing required fields!");
+      showToast("Missing required fields (Title, Slug, or Content)!");
       return;
     }
 
@@ -145,30 +113,23 @@ export default function SuperadminDashboard() {
             {activeTab === 'cms' && (
               <div className="space-y-6 animate-in fade-in">
                 
-                {/* AI Header Panel */}
-                <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/20 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                {/* Clean Header Panel */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-4">
                   <div>
-                    <h2 className="text-xl font-black text-white flex items-center"><Sparkles className="w-5 h-5 mr-2 text-blue-400" /> Mailvah AI SEO Engine</h2>
-                    <p className="text-sm text-blue-200/60 mt-1">Plugged into Gemini API. Generate rank-ready content instantly.</p>
+                    <h2 className="text-xl font-black text-white flex items-center"><Edit3 className="w-5 h-5 mr-2 text-blue-500" /> Content Manager</h2>
+                    <p className="text-sm text-slate-400 mt-1">Write and publish articles directly to your Supabase database.</p>
                   </div>
-                  <button 
-                    onClick={handleAIGenerate}
-                    disabled={isGenerating || !articleData.title}
-                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-900/50 flex items-center transition-all disabled:opacity-50"
-                  >
-                    {isGenerating ? <span className="animate-pulse">Thinking...</span> : <><Sparkles className="w-4 h-4 mr-2" /> Auto-Generate Post</>}
-                  </button>
                 </div>
 
                 {/* Editor Area */}
                 <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-6 shadow-xl">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                      <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Article Title (Type this first!)</label>
+                      <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Article Title</label>
                       <input 
                         type="text" 
                         value={articleData.title}
-                        onChange={(e) => setArticleData({...articleData, title: e.target.value})}
+                        onChange={handleTitleChange}
                         className="w-full bg-[#050810] border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none font-bold" 
                         placeholder="e.g. Why Catch-All Emails Destroy Sender Reputation" 
                       />
@@ -203,6 +164,7 @@ export default function SuperadminDashboard() {
                       value={articleData.description}
                       onChange={(e) => setArticleData({...articleData, description: e.target.value})}
                       className="w-full bg-[#050810] border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 focus:outline-none font-medium h-20 resize-none"
+                      placeholder="A short summary for Google search results..."
                     ></textarea>
                   </div>
 
@@ -215,7 +177,7 @@ export default function SuperadminDashboard() {
                         value={articleData.content}
                         onChange={(e) => setArticleData({...articleData, content: e.target.value})}
                         className="w-full h-[500px] bg-transparent p-4 text-slate-300 focus:outline-none font-mono text-sm leading-relaxed resize-none"
-                        placeholder="Write your content here or use the AI generator..."
+                        placeholder="Write your content here using Markdown formatting (## for headers, ** for bold, etc)..."
                       ></textarea>
                     </div>
                   </div>
