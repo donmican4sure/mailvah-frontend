@@ -1,16 +1,21 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { 
   LayoutDashboard, Users, FileText, Settings, 
   Save, Check, Search, ShieldAlert, Activity, 
   DollarSign, Edit3, Trash2, Plus, List
 } from 'lucide-react';
 
+// Initialize Supabase directly in the file to avoid import errors
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
 export default function SuperadminDashboard() {
   const [activeTab, setActiveTab] = useState('cms');
-  const [cmsView, setCmsView] = useState('write'); // 'write' or 'manage'
+  const [cmsView, setCmsView] = useState('write'); 
   
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,17 +31,17 @@ export default function SuperadminDashboard() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Auto-generate URL slug as you type the title
   const handleTitleChange = (e) => {
     const newTitle = e.target.value;
     const generatedSlug = newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     setArticleData({ ...articleData, title: newTitle, slug: generatedSlug });
   };
 
-  // --- DATABASE OPERATIONS ---
-
-  // Fetch articles from Supabase
   const fetchArticles = async () => {
+    if (!supabase) {
+        showToast("Supabase not connected. Check environment variables.");
+        return;
+    }
     setIsLoading(true);
     try {
       const { data, error } = await supabase
@@ -54,8 +59,11 @@ export default function SuperadminDashboard() {
     }
   };
 
-  // Save new article to Supabase
   const handlePublish = async () => {
+    if (!supabase) {
+        showToast("Supabase not connected. Check environment variables.");
+        return;
+    }
     if (!articleData.title || !articleData.slug || !articleData.content) {
       showToast("Missing required fields (Title, Slug, or Content)!");
       return;
@@ -63,7 +71,7 @@ export default function SuperadminDashboard() {
 
     setIsSaving(true);
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('blogs')
         .insert([{
             title: articleData.title,
@@ -78,8 +86,8 @@ export default function SuperadminDashboard() {
       
       showToast('Article published to Database!');
       setArticleData({ title: '', slug: '', description: '', content: '', category: 'Deliverability', author: 'Olorunleke Ogundele' });
-      setCmsView('manage'); // Switch to manage view to see the new post
-      fetchArticles(); // Refresh the list
+      setCmsView('manage'); 
+      fetchArticles(); 
     } catch (error) {
       console.error(error);
       showToast(`Error: ${error.message}`);
@@ -88,8 +96,8 @@ export default function SuperadminDashboard() {
     }
   };
 
-  // Delete article from Supabase
   const handleDelete = async (id) => {
+    if (!supabase) return;
     if (!window.confirm("Are you sure you want to delete this article?")) return;
     
     try {
@@ -97,14 +105,13 @@ export default function SuperadminDashboard() {
       if (error) throw error;
       
       showToast("Article deleted successfully.");
-      fetchArticles(); // Refresh the list
+      fetchArticles(); 
     } catch (error) {
       console.error("Error deleting:", error);
       showToast("Failed to delete article.");
     }
   };
 
-  // Load articles when switching to the 'manage' view
   useEffect(() => {
     if (activeTab === 'cms' && cmsView === 'manage') {
       fetchArticles();
@@ -114,14 +121,12 @@ export default function SuperadminDashboard() {
   return (
     <div className="min-h-screen bg-[#0B0F19] text-slate-300 flex font-sans selection:bg-blue-500/30">
       
-      {/* Toast Notification */}
       {toast && (
         <div className="fixed bottom-6 right-6 bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 px-4 py-3 rounded-xl flex items-center shadow-2xl z-[100] animate-in slide-in-from-bottom-5">
           <Check className="w-5 h-5 mr-2" /> {toast}
         </div>
       )}
 
-      {/* SIDEBAR */}
       <div className="w-64 bg-[#050810] border-r border-slate-800 flex flex-col hidden md:flex">
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
           <ShieldAlert className="w-5 h-5 text-blue-500 mr-2" />
@@ -144,9 +149,7 @@ export default function SuperadminDashboard() {
         </div>
       </div>
 
-      {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Top Header */}
         <header className="h-16 border-b border-slate-800 bg-[#0B0F19] flex items-center justify-between px-8 shrink-0">
           <h1 className="text-lg font-bold text-white capitalize">{activeTab.replace('-', ' ')}</h1>
           <div className="flex items-center gap-4">
@@ -157,11 +160,9 @@ export default function SuperadminDashboard() {
           </div>
         </header>
 
-        {/* Scrollable Workspace */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-5xl mx-auto">
 
-            {/* --- TAB 1: OVERVIEW (Mocked for layout) --- */}
             {activeTab === 'overview' && (
               <div className="space-y-6 animate-in fade-in">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -181,7 +182,6 @@ export default function SuperadminDashboard() {
               </div>
             )}
 
-            {/* --- TAB 2: USER MANAGEMENT (Mocked for layout) --- */}
             {activeTab === 'users' && (
               <div className="bg-slate-900 rounded-2xl border border-slate-800 p-8 text-center animate-in fade-in">
                 <Users className="w-12 h-12 text-slate-600 mx-auto mb-4" />
@@ -190,11 +190,8 @@ export default function SuperadminDashboard() {
               </div>
             )}
 
-            {/* --- TAB 3: FUNCTIONAL CMS ENGINE --- */}
             {activeTab === 'cms' && (
               <div className="space-y-6 animate-in fade-in">
-                
-                {/* CMS Sub-Navigation */}
                 <div className="flex bg-slate-900 rounded-xl p-1 border border-slate-800 w-max">
                   <button onClick={() => setCmsView('write')} className={`flex items-center px-6 py-2.5 text-sm font-bold rounded-lg transition-colors ${cmsView === 'write' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}>
                     <Edit3 className="w-4 h-4 mr-2" /> Write Article
@@ -204,7 +201,6 @@ export default function SuperadminDashboard() {
                   </button>
                 </div>
 
-                {/* VIEW A: WRITE ARTICLE */}
                 {cmsView === 'write' && (
                   <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-6 shadow-xl animate-in fade-in">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -275,7 +271,6 @@ export default function SuperadminDashboard() {
                   </div>
                 )}
 
-                {/* VIEW B: MANAGE PUBLISHED ARTICLES */}
                 {cmsView === 'manage' && (
                   <div className="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-xl animate-in fade-in">
                     <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-[#050810]">
