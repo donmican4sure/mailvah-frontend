@@ -51,19 +51,34 @@ function LoginScreen() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-
-    if (!supabase) {
-      setError("SYSTEM OFFLINE: Supabase keys are missing from Vercel.");
-      setLoading(false);
-      return;
-    }
+    setError("WIRETAP ACTIVE: Testing connection to Supabase...");
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      // 1. The Raw Network Ping
+      const rawResponse = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      // 2. Catch Server Rejections (Wrong Key, CORS, etc)
+      if (!rawResponse.ok) {
+         const errData = await rawResponse.text();
+         setError(`SERVER REJECTED [Code ${rawResponse.status}]: ${errData}`);
+         setLoading(false);
+         return;
+      }
+
+      // 3. If the network is perfect, use the official SDK to log in
+      const { error: supaErr } = await supabase.auth.signInWithPassword({ email, password });
+      if (supaErr) throw supaErr;
+
     } catch (err) {
-      setError(err.message);
+      // 4. Catch Total Network Deaths (ISP Block, VPN fail)
+      setError(`NETWORK CRASH: ${err.message}. The browser cannot reach the server.`);
     } finally {
       setLoading(false);
     }
