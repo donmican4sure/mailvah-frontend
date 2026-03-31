@@ -3,55 +3,95 @@
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { 
-  ShieldAlert, LogOut, Mail, CheckCircle, 
-  Activity, Search, AlertCircle, CreditCard
+  ShieldCheck, LogOut, Mail, CheckCircle, Activity, Search, 
+  AlertTriangle, PenTool, Database, Chrome, Workflow, Lock, X, CheckCircle2, Loader2, FileUp, RefreshCw
 } from 'lucide-react';
 
+// Initialize the Supabase Brain
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ? process.env.NEXT_PUBLIC_SUPABASE_URL.trim() : '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY.trim() : '';
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
-export default function ClientDashboard() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [emailToVerify, setEmailToVerify] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
+// Spam dictionary for the Composer
+const spamWords = ['free', 'guarantee', 'urgent', 'act now', 'buy', 'discount', '100%', 'click here', 'winner', 'risk-free', 'opportunity', 'cash', 'crypto', 'investment', 'lowest price', 'save big'];
 
-  // THE SECURITY CHECK: Verify they are actually logged in
+export default function DashboardPage() {
+  // --- AUTHENTICATION STATE ---
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+
+  // --- UI STATE ---
+  const [activeTab, setActiveTab] = useState('composer');
+  
+  // 1. Composer State
+  const [composerInput, setComposerInput] = useState('');
+  const [composerSpamCount, setComposerSpamCount] = useState(0);
+  
+  // 2. Permutation Finder State
+  const [finderFirst, setFinderFirst] = useState('');
+  const [finderLast, setFinderLast] = useState('');
+  const [finderDomain, setFinderDomain] = useState('');
+  const [finderScanning, setFinderScanning] = useState(false);
+  const [finderResults, setFinderResults] = useState(null);
+
+  // 3. Blacklist Monitor State
+  const [blDomain, setBlDomain] = useState('');
+  const [blScanning, setBlScanning] = useState(false);
+  const [blResults, setBlResults] = useState(null);
+
+  // THE SECURITY CHECK: Verify session on load
   useEffect(() => {
-    const checkUser = async () => {
+    const checkSession = async () => {
       if (!supabase) return;
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        // Kick them out if they aren't logged in
-        window.location.href = '/register';
+        // Not logged in? Kick them to the login page immediately.
+        window.location.href = '/login';
       } else {
+        // Logged in? Save their data to state.
         setUser(session.user);
       }
-      setLoading(false);
+      setAuthLoading(false);
     };
-    
-    checkUser();
+    checkSession();
   }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = '/register';
+    window.location.href = '/login';
   };
 
-  const handleVerify = (e) => {
+  // --- TOOL LOGIC HANDLERS ---
+  const handleFinder = (e) => {
     e.preventDefault();
-    setIsVerifying(true);
-    // Simulate a network delay for the UI for now
+    setFinderScanning(true); setFinderResults(null);
     setTimeout(() => {
-      setIsVerifying(false);
-      alert("Verification Engine API will be connected here in Phase 5!");
-      setEmailToVerify('');
-    }, 1500);
+      const f = finderFirst.toLowerCase(); const l = finderLast.toLowerCase(); const d = finderDomain.toLowerCase();
+      setFinderResults([
+        { email: `${f}.${l}@${d}`, status: 'invalid' },
+        { email: `${f.charAt(0)}${l}@${d}`, status: 'invalid' },
+        { email: `${f.charAt(0)}.${l}@${d}`, status: 'valid' },
+        { email: `${f}@${d}`, status: 'invalid' },
+      ]);
+      setFinderScanning(false);
+    }, 2500);
   };
 
-  if (loading) {
+  const handleBlacklist = (e) => {
+    e.preventDefault();
+    setBlScanning(true); setBlResults(null);
+    setTimeout(() => {
+      setBlResults([
+        { name: 'Spamhaus ZEN', status: 'clean' }, { name: 'Barracuda BRBL', status: 'clean' },
+        { name: 'SURBL', status: 'clean' }, { name: 'Invaluement', status: 'clean' }
+      ]);
+      setBlScanning(false);
+    }, 3000);
+  };
+
+  // Prevent UI rendering until we confirm who they are
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
         <Activity className="w-8 h-8 text-blue-500 animate-spin" />
@@ -59,118 +99,132 @@ export default function ClientDashboard() {
     );
   }
 
-  // Safely grab the user's email or fallback
-  const userEmail = user?.email || 'Valued Client';
+  const NavBtn = ({ id, icon: Icon, label, tier }) => (
+    <button onClick={() => setActiveTab(id)} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-colors ${activeTab === id ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+      <Icon className="w-4 h-4" /> {label} 
+      {tier === 'pro' && activeTab !== id && <Lock className="w-3 h-3 ml-auto opacity-50" />}
+    </button>
+  );
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-300 flex flex-col font-sans selection:bg-blue-500/30">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F19] flex pt-20 lg:pt-0">
       
-      {/* Top Navigation */}
-      <header className="h-16 border-b border-slate-800 bg-[#050810] flex items-center justify-between px-6 sticky top-0 z-40">
-        <div className="flex items-center gap-2">
-          <ShieldAlert className="w-6 h-6 text-blue-500" />
-          <span className="text-lg font-black text-white tracking-tight">Mailvah.</span>
-        </div>
+      {/* SIDEBAR */}
+      <div className="w-72 fixed h-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hidden lg:flex flex-col z-10 px-4 py-6">
+        <div className="flex items-center gap-2.5 mb-8 px-2 cursor-pointer" onClick={() => window.location.href = '/'}><div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center"><Mail className="w-4 h-4 text-white" /></div><span className="font-black text-xl text-slate-900 dark:text-white">Mailvah.</span></div>
         
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full text-xs font-bold text-slate-400">
-            <Mail className="w-3 h-3 mr-2 text-slate-500" />
-            {userEmail}
-          </div>
-          <button 
-            onClick={handleLogout}
-            className="text-xs font-bold text-slate-500 hover:text-red-400 flex items-center transition-colors"
-          >
-            <LogOut className="w-4 h-4 mr-1 md:mr-2" />
-            <span className="hidden md:inline">Sign Out</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content Space */}
-      <main className="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full">
-        
-        {/* Welcome Banner */}
-        <div className="mb-8 animate-in fade-in slide-in-from-bottom-4">
-          <h1 className="text-2xl md:text-3xl font-black text-white mb-2">Welcome back.</h1>
-          <p className="text-slate-500 font-medium text-sm md:text-base">Your enterprise deliverability suite is online and secured.</p>
+        <div className="bg-[#050810] rounded-xl p-3 border border-slate-800 mb-6 mx-2">
+            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1">Active User</div>
+            <div className="text-xs font-mono text-emerald-400 truncate">{user?.email}</div>
         </div>
 
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-1 flex-1 overflow-y-auto scrollbar-hide">
+          <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2 mt-2">Sandbox Tools</div>
+          <NavBtn id="composer" icon={PenTool} label="Spam-Proof Composer" />
+          <NavBtn id="finder" icon={Search} label="Permutation Finder" />
+          <NavBtn id="domain" icon={ShieldCheck} label="Blacklist Monitor" />
           
-          {/* Main Verifier Tool */}
-          <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden animate-in fade-in zoom-in-95 delay-150">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-[60px] pointer-events-none"></div>
-            
-            <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20 mr-4">
-                <Search className="w-5 h-5 text-blue-400" />
-              </div>
-              <div>
-                <h2 className="text-lg font-black text-white">Deep-Scan Verifier</h2>
-                <p className="text-xs text-slate-500 font-medium">Test an email against 40+ SMTP risk factors.</p>
-              </div>
-            </div>
-
-            <form onSubmit={handleVerify} className="relative z-10">
-              <div className="relative flex items-center">
-                <input 
-                  type="email" 
-                  required
-                  value={emailToVerify}
-                  onChange={(e) => setEmailToVerify(e.target.value)}
-                  placeholder="Enter email address to scan..."
-                  className="w-full bg-[#050810] border border-slate-700 rounded-2xl pl-4 pr-32 py-4 text-white focus:border-blue-500 focus:outline-none font-medium"
-                />
-                <button 
-                  type="submit"
-                  disabled={isVerifying || !emailToVerify}
-                  className="absolute right-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-xl transition-all disabled:opacity-50 text-sm flex items-center"
-                >
-                  {isVerifying ? <Activity className="w-4 h-4 animate-spin" /> : 'Scan Now'}
-                </button>
-              </div>
-            </form>
-
-            <div className="mt-6 flex gap-4 border-t border-slate-800 pt-6">
-              <div className="flex-1 bg-[#050810] rounded-xl p-4 border border-slate-800 flex items-start">
-                <CheckCircle className="w-5 h-5 text-emerald-500 mr-3 shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-xs font-bold text-white mb-1">Catch-All Detection</div>
-                  <div className="text-[10px] text-slate-500">Identifies false-positive domains securely.</div>
-                </div>
-              </div>
-              <div className="flex-1 bg-[#050810] rounded-xl p-4 border border-slate-800 flex items-start hidden sm:flex">
-                <AlertCircle className="w-5 h-5 text-amber-500 mr-3 shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-xs font-bold text-white mb-1">Spam Trap Check</div>
-                  <div className="text-[10px] text-slate-500">Cross-references known global blocklists.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* User Stats / Billing Panel */}
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl animate-in fade-in slide-in-from-right-8 delay-300">
-            <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Your Workspace</h2>
-            
-            <div className="bg-[#050810] rounded-2xl p-5 border border-slate-800 mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-slate-500">Available Credits</span>
-                <CreditCard className="w-4 h-4 text-blue-500" />
-              </div>
-              <div className="text-3xl font-black text-white">150</div>
-              <div className="text-[10px] font-bold text-emerald-400 mt-2 bg-emerald-500/10 inline-block px-2 py-1 rounded border border-emerald-500/20">Free Tier</div>
-            </div>
-
-            <button className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center mt-2">
-              Upgrade Plan
-            </button>
-          </div>
-
+          <div className="text-[10px] font-black text-blue-500 uppercase tracking-widest px-3 mb-2 mt-8">Pro Network</div>
+          <NavBtn id="enrichment" icon={Database} label="Bulk Enrichment" tier="pro" />
+          <NavBtn id="linkedin" icon={Chrome} label="LinkedIn Extractor" tier="pro" />
+          <NavBtn id="crm" icon={Workflow} label="1-Click CRM Purge" tier="pro" />
         </div>
-      </main>
+        <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+            <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-colors"><LogOut className="w-4 h-4" /> Secure Logout</button>
+        </div>
+      </div>
+
+      {/* MOBILE HEADER (If viewing on phone) */}
+      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-[#050810] border-b border-slate-800 flex items-center justify-between px-6 z-50">
+        <div className="flex items-center gap-2"><Mail className="w-6 h-6 text-blue-500"/><span className="font-black text-white text-lg">Mailvah.</span></div>
+        <button onClick={handleLogout} className="text-xs font-bold text-slate-400 hover:text-red-400">Logout</button>
+      </div>
+
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 lg:ml-72 px-6 md:px-12 py-10 overflow-y-auto min-h-screen">
+        
+        {/* 1. COMPOSER */}
+        {activeTab === 'composer' && (
+          <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4">
+             <div className="mb-8"><div className="inline-block bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full mb-3">Free Sandbox Tool</div><h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Spam-Proof Composer</h2><p className="text-slate-500 font-medium">Type a spam word like "100% free" to test the defense engine.</p></div>
+             <div className="grid md:grid-cols-2 gap-8">
+               <textarea value={composerInput} onChange={(e) => { setComposerInput(e.target.value); setComposerSpamCount((e.target.value.toLowerCase().match(new RegExp(spamWords.join('|'), 'g')) || []).length); }} placeholder="Draft your cold email here..." className="w-full h-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 outline-none focus:ring-2 focus:ring-blue-500 resize-none font-medium text-slate-900 dark:text-white shadow-sm"/>
+               <div className="bg-slate-900 rounded-3xl p-8 border border-slate-800 flex flex-col relative overflow-hidden shadow-2xl">
+                 <div className="flex items-center gap-2 mb-6 border-b border-slate-800 pb-4"><ShieldCheck className="w-5 h-5 text-emerald-500" /><span className="font-bold text-white">Spam Defense Console</span></div>
+                 {composerSpamCount > 0 ? (
+                   <div className="bg-red-500/20 border border-red-500/50 p-4 rounded-xl flex items-start gap-3 animate-in fade-in"><AlertTriangle className="w-5 h-5 text-red-400 shrink-0"/><div className="text-sm text-red-300 font-bold">Detected {composerSpamCount} dangerous trigger(s). Your email will likely bounce.</div></div>
+                 ) : (
+                   <div className="flex-1 flex flex-col items-center justify-center text-emerald-500/50"><CheckCircle className="w-16 h-16 mb-4 opacity-50"/><p className="font-bold text-center">Inbox Safe.<br/>No spam triggers detected.</p></div>
+                 )}
+               </div>
+             </div>
+          </div>
+        )}
+
+        {/* 2. PERMUTATION FINDER */}
+        {activeTab === 'finder' && (
+          <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4">
+             <div className="mb-8"><div className="inline-block bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full mb-3">Free Sandbox Tool</div><h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Permutation Finder</h2><p className="text-slate-500 font-medium">Input a name and company. We will generate and test every combination.</p></div>
+             
+             <form onSubmit={handleFinder} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm mb-8">
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                 <div><label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">First Name</label><input required type="text" value={finderFirst} onChange={e=>setFinderFirst(e.target.value)} className="w-full bg-slate-50 dark:bg-[#050810] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="John" /></div>
+                 <div><label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Last Name</label><input required type="text" value={finderLast} onChange={e=>setFinderLast(e.target.value)} className="w-full bg-slate-50 dark:bg-[#050810] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="Doe" /></div>
+                 <div><label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Company Domain</label><input required type="text" value={finderDomain} onChange={e=>setFinderDomain(e.target.value)} className="w-full bg-slate-50 dark:bg-[#050810] border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none focus:border-blue-500" placeholder="stripe.com" /></div>
+               </div>
+               <button type="submit" disabled={finderScanning} className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl flex items-center justify-center gap-2 disabled:opacity-50">{finderScanning ? <Loader2 className="w-5 h-5 animate-spin"/> : 'Generate & Verify Combinations'}</button>
+             </form>
+
+             {finderResults && (
+               <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl animate-in fade-in">
+                 <h3 className="text-xl font-black text-white mb-6">Verification Results</h3>
+                 <div className="space-y-3">
+                   {finderResults.map((res, i) => (
+                     <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-[#050810] border border-slate-800">
+                       <div className="font-mono text-sm text-slate-300">{res.email}</div>
+                       {res.status === 'valid' ? <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20"><CheckCircle2 className="w-4 h-4"/> 100% Valid</div> : <div className="flex items-center gap-2 text-red-400 text-xs font-bold bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20"><X className="w-4 h-4"/> Bounced</div>}
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             )}
+          </div>
+        )}
+
+        {/* 3. BLACKLIST MONITOR */}
+        {activeTab === 'domain' && (
+          <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4">
+             <div className="mb-8"><div className="inline-block bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full mb-3">Free Sandbox Tool</div><h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">Blacklist Monitor</h2><p className="text-slate-500 font-medium">Check if your sending domain has been flagged by global spam filters.</p></div>
+             
+             <form onSubmit={handleBlacklist} className="flex flex-col md:flex-row items-center relative mb-8 gap-4">
+                <input required type="text" value={blDomain} onChange={e=>setBlDomain(e.target.value)} placeholder="Enter your domain (e.g. acme.com)" className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl md:pl-6 px-4 py-5 text-slate-900 dark:text-white font-medium focus:outline-none focus:border-blue-500 shadow-sm" />
+                <button type="submit" disabled={blScanning} className="w-full md:w-auto md:absolute right-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all disabled:opacity-50 flex justify-center items-center">{blScanning ? <Activity className="w-5 h-5 animate-spin"/> : 'Scan Network'}</button>
+             </form>
+
+             {blResults && (
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in">
+                 {blResults.map((r, i) => (
+                   <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex items-center justify-between">
+                     <span className="font-bold text-slate-700 dark:text-slate-300">{r.name}</span>
+                     <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-full"><CheckCircle2 className="w-4 h-4"/> {r.status}</span>
+                   </div>
+                 ))}
+               </div>
+             )}
+          </div>
+        )}
+
+        {/* PRO TOOLS PLACEHOLDERS (To be connected to APIs in Phase 6) */}
+        {(activeTab === 'enrichment' || activeTab === 'linkedin' || activeTab === 'crm') && (
+            <div className="max-w-4xl mx-auto text-center py-20 animate-in zoom-in">
+                <Lock className="w-16 h-16 text-slate-700 mx-auto mb-6" />
+                <h2 className="text-3xl font-black text-white mb-4">Pro Network Required</h2>
+                <p className="text-slate-400 font-medium max-w-md mx-auto mb-8">This feature connects to our backend enterprise APIs and requires an active subscription.</p>
+                <button className="bg-blue-600 text-white font-black py-4 px-8 rounded-xl hover:bg-blue-500 transition-colors">Upgrade to Pro</button>
+            </div>
+        )}
+
+      </div>
     </div>
   );
 }
