@@ -63,31 +63,43 @@ export default function DashboardPage() {
   };
 
   // --- TOOL LOGIC HANDLERS ---
-  const handleFinder = (e) => {
+  const handleFinder = async (e) => {
     e.preventDefault();
-    setFinderScanning(true); setFinderResults(null);
-    setTimeout(() => {
-      const f = finderFirst.toLowerCase(); const l = finderLast.toLowerCase(); const d = finderDomain.toLowerCase();
-      setFinderResults([
-        { email: `${f}.${l}@${d}`, status: 'invalid' },
-        { email: `${f.charAt(0)}${l}@${d}`, status: 'invalid' },
-        { email: `${f.charAt(0)}.${l}@${d}`, status: 'valid' },
-        { email: `${f}@${d}`, status: 'invalid' },
-      ]);
-      setFinderScanning(false);
-    }, 2500);
-  };
+    setFinderScanning(true); 
+    setFinderResults(null);
+    
+    const f = finderFirst.toLowerCase().trim(); 
+    const l = finderLast.toLowerCase().trim(); 
+    const d = finderDomain.toLowerCase().trim();
 
-  const handleBlacklist = (e) => {
-    e.preventDefault();
-    setBlScanning(true); setBlResults(null);
-    setTimeout(() => {
-      setBlResults([
-        { name: 'Spamhaus ZEN', status: 'clean' }, { name: 'Barracuda BRBL', status: 'clean' },
-        { name: 'SURBL', status: 'clean' }, { name: 'Invaluement', status: 'clean' }
-      ]);
-      setBlScanning(false);
-    }, 3000);
+    // Generate the standard permutations
+    const permutations = [
+      `${f}.${l}@${d}`,
+      `${f.charAt(0)}${l}@${d}`,
+      `${f.charAt(0)}.${l}@${d}`,
+      `${f}@${d}`
+    ];
+
+    try {
+      // Send the permutations to our REAL backend API
+      const response = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emails: permutations })
+      });
+
+      if (!response.ok) throw new Error("API Network Failure");
+
+      const data = await response.json();
+      
+      // Update the UI with the real network results!
+      setFinderResults(data.results);
+    } catch (error) {
+      console.error(error);
+      alert("Verification Engine failed to connect. Check your network.");
+    } finally {
+      setFinderScanning(false);
+    }
   };
 
   // Prevent UI rendering until we confirm who they are
