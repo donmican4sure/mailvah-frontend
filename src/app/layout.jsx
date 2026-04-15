@@ -2,6 +2,7 @@ import './globals.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
+// SEO METADATA (The Social Media Billboard)
 export const metadata = {
   title: 'Mailvah | Unbreakable Deliverability & Outbound Security',
   description: 'Stop paying for dead databases. Mailvah uses a proprietary bare-metal Heuristic Decoy engine to guarantee near-zero bounce rates.',
