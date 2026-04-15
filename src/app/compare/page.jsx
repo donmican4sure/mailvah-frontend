@@ -1,17 +1,39 @@
 'use client';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, X, ShieldAlert, Cpu, Crosshair } from 'lucide-react';
+import { Check, X, ShieldAlert, Database, Layers, TrendingDown, Zap } from 'lucide-react';
 
-const competitors = [
-  { name: '4x Compute Heuristic Scan', mailvah: true, others: false },
-  { name: 'Catch-all Decoy Protocol', mailvah: true, others: false },
-  { name: 'Bare-Metal Dallas Infrastructure', mailvah: true, others: false },
-  { name: '100% Credit Rollover', mailvah: true, others: false },
-  { name: 'Dual-Vault Economics (Hunt vs Wash)', mailvah: true, others: false },
-  { name: 'Sub-Second API Responses', mailvah: true, others: false },
-  { name: 'Standard SMTP Ping', mailvah: true, others: true },
-  { name: 'Syntax Checking', mailvah: true, others: true },
+const comparisonPoints = [
+  { 
+    category: 'Data Core', 
+    mailvah: 'Live Heuristic Engine (Real-time)', 
+    legacy: 'Cached Database (Stale/Static)' 
+  },
+  { 
+    category: 'Data Decay Rate', 
+    mailvah: '0% (Verified at the exact millisecond)', 
+    legacy: '> 30% Annually (People change jobs)' 
+  },
+  { 
+    category: 'Platform Focus', 
+    mailvah: 'Dedicated Outbound Security & Delivery', 
+    legacy: 'Bloated CRMs & Clunky Sales Dialers' 
+  },
+  { 
+    category: 'Pricing Model', 
+    mailvah: 'Pay for Compute Power (Results)', 
+    legacy: 'Pay for Dead/Bounced Leads' 
+  },
+  { 
+    category: 'Infrastructure', 
+    mailvah: 'Bare-Metal Dallas Nodes', 
+    legacy: 'Shared Public Cloud Functions' 
+  },
+  { 
+    category: 'Credit Expiry', 
+    mailvah: '100% Infinite Rollover', 
+    legacy: 'Use it or lose it every 30 days' 
+  }
 ];
 
 export default function PremiumCompare() {
@@ -21,87 +43,122 @@ export default function PremiumCompare() {
   };
 
   const item = {
-    hidden: { opacity: 0, x: -20 },
-    show: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeOut" } }
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
   };
 
   return (
     <div className="relative min-h-screen bg-[#03050a] py-24 md:py-32 px-4 md:px-6 overflow-hidden font-sans">
-      <div className="absolute top-[20%] left-[-10%] w-[600px] h-[600px] bg-sky-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen"></div>
-      <div className="absolute bottom-[10%] right-[-10%] w-[600px] h-[600px] bg-rose-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen"></div>
+      {/* AGGRESSIVE GLOWS */}
+      <div className="absolute top-[10%] left-[-10%] w-[600px] h-[600px] bg-sky-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen"></div>
+      <div className="absolute bottom-[20%] right-[-10%] w-[600px] h-[600px] bg-rose-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen"></div>
 
-      <div className="max-w-[1400px] mx-auto relative z-10">
+      <div className="max-w-5xl mx-auto relative z-10">
         
-        {/* AGGRESSIVE HERO MESSAGING */}
+        {/* HERO SECTION */}
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 text-xs font-black text-rose-400 uppercase tracking-widest mb-6">
-            <ShieldAlert className="w-4 h-4" /> Stop Burning Domains
+            <TrendingDown className="w-4 h-4" /> B2B Data Decays 30% Every Year
           </div>
-          <h1 className="text-4xl md:text-7xl font-black text-white mb-6 tracking-tight">Mailvah <span className="text-slate-500 italic font-medium">vs.</span> The Industry</h1>
+          <h1 className="text-4xl md:text-7xl font-black text-white mb-6 tracking-tight">Stop paying for <br/><span className="text-rose-500">dead databases.</span></h1>
           <p className="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            Most legacy tools resell the exact same basic API pings. We don't ping once. <strong className="text-white">Every Mailvah credit executes a 4-stage Heuristic Decoy protocol using 4x the computing power of a standard API.</strong>
+            Legacy tools like Apollo, Hunter, and ZoomInfo rely on scraped, cached databases. If they scraped a lead 6 months ago, you are paying for an email that will bounce today. 
           </p>
         </motion.div>
 
-        {/* WIDE COMPARISON TABLE (SCROLLABLE ON MOBILE) */}
-        <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-2xl md:rounded-[3rem] shadow-[0_0_50px_rgba(56,189,248,0.05)] overflow-hidden">
-          <div className="overflow-x-auto custom-scrollbar">
-            <table className="w-full text-left border-collapse min-w-[1000px]">
-              <thead>
-                <tr>
-                  <th className="p-6 md:p-8 text-slate-500 uppercase text-xs font-black tracking-widest border-b border-white/10 w-1/4 sticky left-0 bg-[#070b14] z-20">Engine Capabilities</th>
-                  <th className="p-6 md:p-8 text-sky-400 uppercase text-sm font-black tracking-widest text-center border-b border-white/10 bg-sky-500/5 border-x border-white/5">Mailvah Pro</th>
-                  <th className="p-6 text-slate-400 uppercase text-xs font-bold text-center border-b border-white/10">Apollo</th>
-                  <th className="p-6 text-slate-400 uppercase text-xs font-bold text-center border-b border-white/10">Hunter.io</th>
-                  <th className="p-6 text-slate-400 uppercase text-xs font-bold text-center border-b border-white/10">Skrapp</th>
-                  <th className="p-6 text-slate-400 uppercase text-xs font-bold text-center border-b border-white/10">Snov.io</th>
-                  <th className="p-6 text-slate-400 uppercase text-xs font-bold text-center border-b border-white/10">ContactOut</th>
-                </tr>
-              </thead>
-              <motion.tbody variants={container} initial="hidden" animate="show">
-                {competitors.map((comp, i) => (
-                  <motion.tr variants={item} key={i} className="group hover:bg-white/[0.02] transition-colors border-b border-white/5 last:border-0">
-                    <td className="p-6 md:p-8 text-slate-300 font-medium group-hover:text-white transition-colors sticky left-0 bg-[#070b14] group-hover:bg-[#0a0f1c] z-10">{comp.name}</td>
-                    
-                    {/* Mailvah Column */}
-                    <td className="p-6 bg-sky-500/5 border-x border-white/5 text-center">
-                      <div className="bg-emerald-500/20 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                        <Check className="text-emerald-400 w-5 h-5 md:w-6 md:h-6" />
-                      </div>
-                    </td>
-                    
-                    {/* Legacy Columns */}
-                    {[1, 2, 3, 4, 5].map((num) => (
-                      <td key={num} className="p-6 text-center">
-                        {comp.others ? (
-                          <div className="bg-slate-800/50 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mx-auto border border-white/5">
-                            <Check className="text-slate-500 w-4 h-4 md:w-5 md:h-5" />
-                          </div>
-                        ) : (
-                          <div className="bg-rose-500/10 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center mx-auto border border-rose-500/10">
-                            <X className="text-rose-500/50 w-4 h-4 md:w-5 md:h-5" />
-                          </div>
-                        )}
-                      </td>
-                    ))}
-                  </motion.tr>
+        {/* HEAD TO HEAD MATRIX */}
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-3xl md:rounded-[3rem] shadow-[0_0_50px_rgba(56,189,248,0.05)] overflow-hidden mb-20">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3">
+            
+            {/* Context Column (Hidden on mobile for cleaner look, shown on desktop) */}
+            <div className="hidden lg:block p-8 border-r border-white/5 bg-black/20">
+              <h3 className="text-slate-500 uppercase text-xs font-black tracking-widest mb-10 mt-4">The Metric</h3>
+              <div className="space-y-12">
+                {comparisonPoints.map((point, i) => (
+                  <div key={i} className="text-slate-300 font-bold text-sm h-8 flex items-center">{point.category}</div>
                 ))}
-              </motion.tbody>
-            </table>
-          </div>
-        </div>
+              </div>
+            </div>
 
-        {/* 4X COMPUTE HIGHLIGHT */}
-        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="mt-16 bg-gradient-to-br from-indigo-900/30 to-slate-900/30 border border-indigo-500/20 p-8 md:p-12 rounded-[2rem] flex flex-col md:flex-row items-center gap-8">
-           <div className="bg-indigo-500/20 p-6 rounded-3xl border border-indigo-500/30 shrink-0">
-             <Cpu className="w-12 h-12 text-indigo-400" />
-           </div>
-           <div>
-             <h3 className="text-2xl font-black text-white mb-3">Why 4x Compute matters.</h3>
-             <p className="text-slate-400 leading-relaxed">
-               When Apollo or Snov.io pings an email server, enterprise firewalls like Mimecast and Proofpoint instantly return a fake "Valid" response (a Catch-All trap). Mailvah bypasses this by utilizing 4x the computing power to execute a multi-stage decoy handshake, forcing the firewall to reveal the true status of the inbox before we charge you a credit.
+            {/* MAILVAH COLUMN (THE WINNER) */}
+            <div className="p-8 lg:p-10 border-b md:border-b-0 md:border-r border-white/5 relative bg-sky-500/5">
+              <div className="absolute top-0 left-0 w-full h-1 bg-sky-500"></div>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="bg-sky-500 p-2 rounded-xl"><Zap className="w-6 h-6 text-slate-900" /></div>
+                <h2 className="text-3xl font-black text-white">Mailvah</h2>
+              </div>
+              
+              <div className="space-y-10">
+                {comparisonPoints.map((point, i) => (
+                  <div key={i} className="h-auto md:h-10">
+                    <span className="lg:hidden text-sky-500 text-[10px] font-black uppercase tracking-widest block mb-1">{point.category}</span>
+                    <div className="flex items-start gap-3 text-white font-bold">
+                      <Check className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                      {point.mailvah}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* THE LEGACY COLUMN (THE LOSER) */}
+            <div className="p-8 lg:p-10 bg-rose-500/5 relative">
+              <div className="absolute top-0 left-0 w-full h-1 bg-rose-500"></div>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="bg-rose-500/10 border border-rose-500/20 p-2 rounded-xl"><Database className="w-6 h-6 text-rose-500" /></div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-300">The Wrappers</h2>
+                  <p className="text-xs text-slate-500 font-bold">(Apollo, Hunter, Snov)</p>
+                </div>
+              </div>
+              
+              <div className="space-y-10">
+                {comparisonPoints.map((point, i) => (
+                  <div key={i} className="h-auto md:h-10">
+                    <span className="lg:hidden text-rose-500/50 text-[10px] font-black uppercase tracking-widest block mb-1">{point.category}</span>
+                    <div className="flex items-start gap-3 text-slate-400 font-medium">
+                      <X className="w-5 h-5 text-rose-500/50 shrink-0 mt-0.5" />
+                      {point.legacy}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* FEATURE BLOAT VS FOCUS SECTION */}
+        <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true }} className="grid md:grid-cols-2 gap-8 mb-20">
+           
+           <motion.div variants={item} className="bg-white/[0.02] border border-white/5 rounded-3xl p-10 hover:bg-white/[0.04] transition-colors">
+             <div className="bg-rose-500/10 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 border border-rose-500/20">
+               <Layers className="w-7 h-7 text-rose-400" />
+             </div>
+             <h3 className="text-2xl font-black text-white mb-4">The "All-in-One" Trap</h3>
+             <p className="text-slate-400 leading-relaxed mb-6">
+               Competitors charge $100+ a month because they force you to pay for their bloated CRMs, email warmers, and clunky dialers. They spread their engineering team too thin, and their actual verification tech suffers.
              </p>
-           </div>
+           </motion.div>
+
+           <motion.div variants={item} className="bg-gradient-to-br from-sky-900/20 to-emerald-900/10 border border-sky-500/20 rounded-3xl p-10 relative overflow-hidden">
+             <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-sky-500/20 blur-3xl rounded-full"></div>
+             <div className="bg-sky-500 w-14 h-14 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(56,189,248,0.4)]">
+               <ShieldAlert className="w-7 h-7 text-slate-900" />
+             </div>
+             <h3 className="text-2xl font-black text-white mb-4">The Security Focus</h3>
+             <p className="text-slate-400 leading-relaxed mb-6">
+               Mailvah is not a CRM. We are an outbound security suite. We dedicate 100% of our engineering budget to maintaining our bare-metal Dallas nodes and updating our firewall penetration protocols. 
+             </p>
+           </motion.div>
+
+        </motion.div>
+
+        {/* FINAL CTA */}
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center">
+          <h2 className="text-3xl md:text-4xl font-black text-white mb-6">Experience real-time compute.</h2>
+          <a href="https://app.mailvah.com/register" className="inline-flex items-center justify-center px-8 py-4 font-black text-slate-900 transition-all duration-200 bg-sky-500 rounded-xl hover:bg-sky-400 shadow-[0_0_40px_rgba(56,189,248,0.4)] hover:scale-[1.02] uppercase tracking-wide">
+            Deploy Free Sandbox Engine
+          </a>
         </motion.div>
 
       </div>
