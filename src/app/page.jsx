@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Radar, Server, ChevronRight, CheckCircle2, Lock, TrendingDown, Cpu, Zap, Mail, Layout } from 'lucide-react';
+import { Shield, Radar, Server, ChevronRight, CheckCircle2, Lock, TrendingDown, Cpu, Zap, Mail, Layout, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PremiumHomePage() {
@@ -177,7 +177,7 @@ export default function PremiumHomePage() {
                     <div className="max-w-2xl mx-auto">
                        <Shield className="w-16 h-16 text-sky-500 mx-auto mb-8" />
                        <h3 className="text-3xl font-black text-white mb-4">Live Verification Terminal</h3>
-                       <p className="text-slate-400 text-lg leading-relaxed">[SYSTEM] Initiating Waterfall for stripe.com... [DNS] Locating MX records... Found mx.stripe.com. [SMTP] -> EHLO verify.mailvah.com</p>
+                       <p className="text-slate-400 text-lg leading-relaxed">[SYSTEM] Initiating Waterfall for stripe.com... [DNS] Locating MX records... Found mx.stripe.com. [SMTP] -&gt; EHLO verify.mailvah.com</p>
                     </div>
                   )}
                   {activeTab === 2 && (
