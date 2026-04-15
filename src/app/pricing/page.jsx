@@ -3,8 +3,13 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Radar, Zap, CheckCircle2, MailCheck, Info, ShieldCheck } from 'lucide-react';
 
-// Dictionary explaining every feature when the user clicks the Info icon
+// Dictionary explaining EVERY feature across all tiers
 const featureExplanations = {
+  // Sandbox Features
+  '115 Verification Credits': 'Start testing our infrastructure immediately with zero commitment.',
+  'Single Domain Search': 'Manually verify individual emails or extract contacts from a specific company.',
+  'Dual-Threat Analyzer': 'Paste your cold email copy to detect words that trigger spam filters.',
+  // Paid Features
   '100% Infinite Credit Rollover': 'Your unused credits never expire as long as your subscription remains active.',
   'Bulk CSV Verification Engine': 'Upload lists of up to 100,000 rows and clean them simultaneously.',
   'Lead Finder': 'Scrape live B2B contact data directly via our global proxy network.',
@@ -28,9 +33,8 @@ const featureExplanations = {
 export default function PremiumPricing() {
   const [sliderIndex, setSliderIndex] = useState(0);
   const [isAnnual, setIsAnnual] = useState(false);
-  const [activeTooltip, setActiveTooltip] = useState(null); // Tracks which tooltip is open
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
-  // The perfectly distributed Upsell Ladder
   const pricingTiers = [
     { name: 'Starter', price: 29, iCredits: 1500, dCredits: 365, 
       features: ['100% Infinite Credit Rollover', 'Bulk CSV Verification Engine', 'Lead Finder', 'Standard REST API Access', 'Basic Email Support'] },
@@ -45,7 +49,6 @@ export default function PremiumPricing() {
   ];
 
   const currentPrice = isAnnual ? Math.floor(pricingTiers[sliderIndex].price * 0.8) : pricingTiers[sliderIndex].price;
-
   const fadeUp = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } };
 
   const toggleTooltip = (feature) => {
@@ -78,6 +81,7 @@ export default function PremiumPricing() {
         </motion.div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-8">
+          
           {/* SANDBOX CARD */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} className="bg-white/[0.02] backdrop-blur-xl border border-white/10 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 flex flex-col hover:bg-white/[0.04] transition-colors h-full">
             <div className="mb-8">
@@ -85,10 +89,29 @@ export default function PremiumPricing() {
               <h3 className="text-3xl md:text-4xl font-black text-white mb-2">Sandbox</h3>
               <div className="text-5xl md:text-6xl font-black text-white mb-2 tracking-tighter">$0<span className="text-xl md:text-2xl text-slate-500 font-medium pb-2">/mo</span></div>
             </div>
-            <div className="flex-1 space-y-4 mb-8">
-              <div className="flex items-start gap-3 text-slate-300"><CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" /><span className="font-medium text-sm md:text-base">150 Verification Credits</span></div>
-              <div className="flex items-start gap-3 text-slate-300"><CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" /><span className="font-medium text-sm md:text-base">Single Domain Search</span></div>
-              <div className="flex items-start gap-3 text-slate-300"><CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" /><span className="font-medium text-sm md:text-base">Dual-Threat Analyzer <span className="text-slate-500 text-xs md:text-sm block font-normal">Test payload & spam triggers</span></span></div>
+            
+            <div className="flex-1 space-y-1 mb-8">
+              {['115 Verification Credits', 'Single Domain Search', 'Dual-Threat Analyzer'].map((feature, i) => (
+                <div key={i} className="flex flex-col">
+                  <div className="flex items-center gap-3 text-slate-300 text-sm py-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="font-medium flex-1">{feature}</span>
+                    <button onClick={() => toggleTooltip(feature)} className="text-slate-500 hover:text-emerald-400 transition-colors p-1" aria-label="Feature details">
+                      <Info className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {/* EXPANDING EXPLANATION BOX FOR SANDBOX */}
+                  <AnimatePresence>
+                    {activeTooltip === feature && (
+                      <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 4 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
+                        <div className="ml-7 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-100 leading-relaxed">
+                          {featureExplanations[feature]}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
             </div>
             <a href="https://app.mailvah.com/register" className="block text-center w-full py-4 rounded-xl font-bold bg-white/5 text-white hover:bg-white/10 transition-colors border border-white/10">Deploy Sandbox</a>
           </motion.div>
@@ -120,12 +143,12 @@ export default function PremiumPricing() {
 
                 <div className="space-y-1 px-2 h-full">
                   <AnimatePresence mode="wait">
-                    <motion.div key={sliderIndex} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }} className="space-y-2">
+                    <motion.div key={sliderIndex} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }} className="space-y-1">
                       {pricingTiers[sliderIndex].features.map((feature, i) => {
                         const isEverything = feature.startsWith('Everything in');
                         return (
                         <div key={i} className="flex flex-col">
-                          <div className="flex items-center gap-3 text-slate-300 text-sm py-1">
+                          <div className="flex items-center gap-3 text-slate-300 text-sm py-1.5">
                             <CheckCircle2 className={`w-4 h-4 shrink-0 ${i === 0 ? 'text-slate-500' : i === pricingTiers[sliderIndex].features.length - 1 ? 'text-indigo-400' : 'text-sky-400'}`} />
                             <span className="font-medium flex-1">{feature}</span>
                             {!isEverything && featureExplanations[feature] && (
@@ -137,7 +160,7 @@ export default function PremiumPricing() {
                           {/* EXPANDING EXPLANATION BOX */}
                           <AnimatePresence>
                             {activeTooltip === feature && (
-                              <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 8 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
+                              <motion.div initial={{ opacity: 0, height: 0, marginTop: 0 }} animate={{ opacity: 1, height: 'auto', marginTop: 4 }} exit={{ opacity: 0, height: 0, marginTop: 0 }} className="overflow-hidden">
                                 <div className="ml-7 p-3 rounded-lg bg-sky-500/10 border border-sky-500/20 text-xs text-sky-100 leading-relaxed">
                                   {featureExplanations[feature]}
                                 </div>
