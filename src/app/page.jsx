@@ -177,7 +177,7 @@ export default function PremiumHomePage() {
                     <div className="max-w-2xl mx-auto">
                        <Shield className="w-16 h-16 text-sky-500 mx-auto mb-8" />
                        <h3 className="text-3xl font-black text-white mb-4">Live Verification Terminal</h3>
-                       <p className="text-slate-400 text-lg leading-relaxed">[SYSTEM] Initiating Waterfall for stripe.com... [DNS] Locating MX records... Found mx.stripe.com. [SMTP] &gt; EHLO verify.mailvah.com</p>
+                       <p className="text-slate-400 text-lg leading-relaxed">[SYSTEM] Initiating Waterfall for stripe.com... [DNS] Locating MX records... Found mx.stripe.com. [SMTP] -&gt; EHLO verify.mailvah.com</p>
                     </div>
                   )}
                   {activeTab === 2 && (
