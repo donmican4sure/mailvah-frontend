@@ -177,7 +177,7 @@ export default function PremiumHomePage() {
                     <div className="max-w-2xl mx-auto">
                        <Shield className="w-16 h-16 text-sky-500 mx-auto mb-8" />
                        <h3 className="text-3xl font-black text-white mb-4">Live Verification Terminal</h3>
-                       <p className="text-slate-400 text-lg leading-relaxed">[SYSTEM] Initiating Waterfall for stripe.com... [DNS] Locating MX records... Found mx.stripe.com. [SMTP] &gt; EHLO verify.mailvah.com</p>
+                       <p className="text-slate-400 text-lg leading-relaxed">[SYSTEM] Initiating Waterfall for stripe.com... [DNS] Locating MX records... Found mx.stripe.com. [SMTP] connecting to EHLO verify.mailvah.com</p>
                     </div>
                   )}
                   {activeTab === 2 && (
@@ -185,4 +185,53 @@ export default function PremiumHomePage() {
                        <div className="w-full max-w-md mx-auto bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-8 mb-8">
                          <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
                          <div className="text-emerald-400 font-black text-xl mb-1">10,000 Rows Cleaned</div>
-                         <div className="text-slate-500 font-mono text-sm">Processing Bulk CSV
+                         <div className="text-slate-500 font-mono text-sm">Processing Bulk CSV...</div>
+                       </div>
+                       <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-black/40 p-4 rounded-xl border border-white/5"><div className="text-white font-black">8,420</div><div className="text-[10px] text-slate-500 uppercase">Diamond Leads</div></div>
+                          <div className="bg-black/40 p-4 rounded-xl border border-white/5"><div className="text-rose-500 font-black">1,580</div><div className="text-[10px] text-slate-500 uppercase">Bounces Removed</div></div>
+                       </div>
+                    </div>
+                  )}
+                  {activeTab === 3 && (
+                    <div className="max-w-2xl mx-auto text-center">
+                       <div className="inline-flex items-center gap-4 bg-rose-500/10 border border-rose-500/20 px-6 py-3 rounded-full text-rose-500 font-bold mb-8 animate-pulse">
+                          <Activity className="w-5 h-5" /> REPUTATION AT RISK: 3 Blacklists Found
+                       </div>
+                       <p className="text-slate-400 text-lg">We monitor your sending domains against 100+ global spam traps in real-time. Never send from a "hot" domain again.</p>
+                    </div>
+                  )}
+                  {activeTab === 4 && (
+                    <div className="max-w-2xl mx-auto">
+                       <div className="bg-black/60 border border-white/10 rounded-xl p-6 text-left font-mono text-sm text-slate-400 mb-8">
+                         <span className="text-rose-500">I guarantee this is a 100% free opportunity...</span>
+                         <div className="mt-4 text-sky-400 font-bold">// SUGGESTION: Remove "guarantee" and "free" to bypass Mimecast filters.</div>
+                       </div>
+                       <h3 className="text-2xl font-black text-white">Payload Optimizer</h3>
+                    </div>
+                  )}
+                </motion.div>
+             </AnimatePresence>
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL READY TO BUILD CTA */}
+      <section className="px-6 py-32 max-w-4xl mx-auto relative z-10 text-center">
+         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-gradient-to-b from-sky-500/10 to-transparent border border-sky-500/20 rounded-[4rem] p-12 md:p-24 relative overflow-hidden">
+            <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter">Ready to build your pipeline?</h2>
+            <p className="text-slate-400 text-lg mb-12 max-w-xl mx-auto leading-relaxed">Join thousands of founders and sales teams who have switched to Mailvah for better data and transparent pricing.</p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+               <a href="https://app.mailvah.com/register" className="w-full md:w-auto px-10 py-5 rounded-2xl font-black bg-sky-500 text-slate-950 hover:bg-sky-400 transition-all text-lg shadow-[0_0_40px_rgba(56,189,248,0.4)]">Get started for free</a>
+               <Link href="/features" className="w-full md:w-auto px-10 py-5 rounded-2xl font-black border border-white/10 text-white hover:bg-white/5 transition-all text-lg flex items-center justify-center gap-2">
+                 <Layout className="w-5 h-5" /> Platform Tour
+               </Link>
+            </div>
+            <div className="mt-12 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-amber-500/20 bg-amber-500/5 text-amber-500 text-[10px] font-black uppercase tracking-widest">
+               <ShieldCheck className="w-4 h-4" /> 30-Day Money-Back Guarantee
+            </div>
+         </motion.div>
+      </section>
+    </div>
+  );
+}
