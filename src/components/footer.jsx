@@ -25,6 +25,7 @@ export default function Footer() {
             <li><Link href="/features" className="hover:text-sky-400 transition-colors">Features</Link></li>
             <li><Link href="/pricing" className="hover:text-sky-400 transition-colors">Pricing</Link></li>
             <li><Link href="/compare" className="hover:text-sky-400 transition-colors">Compare</Link></li>
+            <li><Link href="/faq" className="hover:text-sky-400 transition-colors">FAQ</Link></li>
           </ul>
         </div>
         <div>
@@ -36,8 +37,11 @@ export default function Footer() {
         </div>
         <div>
           <h4 className="text-white font-bold mb-6">Contact</h4>
-          <p className="text-sm text-slate-400">Lagos, Nigeria</p>
-          <p className="text-sm text-sky-400 mt-2">support@mailvah.com</p>
+          <ul className="space-y-4 text-sm text-slate-400">
+            <li><Link href="/contact" className="hover:text-sky-400 transition-colors">Contact Us</Link></li>
+            <li><a href="mailto:support@mailvah.com" className="hover:text-sky-400 transition-colors">support@mailvah.com</a></li>
+            <li className="text-slate-500">Lagos, Nigeria</li>
+          </ul>
         </div>
       </div>
       <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 text-[10px] font-bold text-slate-600 uppercase tracking-widest flex flex-col md:flex-row justify-between">
