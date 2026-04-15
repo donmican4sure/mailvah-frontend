@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Radar, Server, ChevronRight, CheckCircle2, Lock, TrendingDown, Cpu, Zap, Mail, Layout, ShieldCheck } from 'lucide-react';
+import { Shield, Radar, Server, ChevronRight, CheckCircle2, Lock, TrendingDown, Cpu, Zap, Mail, Layout, ShieldCheck, Database, Activity } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PremiumHomePage() {
